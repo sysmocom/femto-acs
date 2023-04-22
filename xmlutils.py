@@ -14,6 +14,8 @@ def get_cwmp_method(root):
         return None
 
     for child in body:
+        if child.tag == '{' + XML_NS['soap-env'] + '}Fault':
+            return ('Fault', child)
         if child.tag == '{urn:dslforum-org:cwmp-1-0}Inform':
             return ('Inform', child)
         if child.tag == '{urn:dslforum-org:cwmp-1-0}SetParameterValuesResponse':

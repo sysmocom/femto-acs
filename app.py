@@ -4,7 +4,7 @@
 
 import configparser
 import logging
-from xml.etree.ElementTree import fromstring
+from xml.etree.ElementTree import fromstring, tostring
 
 from flask import Flask, make_response, render_template, request, session
 from flask_caching import Cache
@@ -62,6 +62,11 @@ def generate_config(params=None, serial=None, config_file='./config/femtocells.i
 @app.route('/', methods=['GET', 'POST'])
 def root():
     return 'This is a femto-acs/tr069 server'
+
+def fault(tree, node):
+    """ handle a Fault """
+    LOG.error("Fault: %s", tostring(node).decode('utf-8'))
+    return "Fault"
 
 def inform(tree, node):
     """ handle a device Inform request """
@@ -148,6 +153,9 @@ def acs():
         return 'Failed to get the cwmp method'
 
     method, node = method
+
+    if method == "Fault":
+        return fault(tree, node)
 
     if method == "Inform":
         return inform(tree, node)
